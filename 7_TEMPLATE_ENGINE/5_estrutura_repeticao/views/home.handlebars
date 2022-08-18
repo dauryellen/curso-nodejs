@@ -1,0 +1,20 @@
+<h1>Home</h1>
+
+{{#if auth}}
+
+  <p>
+    Seja bem-vindo(a), {{user.name}} {{user.surname}}!
+  </p>
+
+  <p>
+    Você está autenticado! <a href="/dashboard">Clique aqui</a> 
+    para acessar a aŕea de membros.
+  </p>
+
+{{else}}  
+
+  <p>
+    Você não está autenticado!
+  </p>
+
+{{/if}}
