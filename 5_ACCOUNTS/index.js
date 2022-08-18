@@ -27,7 +27,8 @@ function operation() {
                 "Depositar",
                 "Sacar",
                 "Transferir",
-                "Solicitar Cheque Especial",
+                "Cheque Especial",
+                "Excluir Conta",
                 "Sair"
             ],
         },
@@ -259,9 +260,52 @@ function overdraft() {
         }
     ])
     .then((answer) => {
-        console.log("Cheguei aqui");
+        const accountName = answer["accountName"];
+        
+        // verify if name is empty and verify if account exists
+        if (nameIsEmpty(accountName)) {
+            return overdraft();
+        } else if (!checkAccountExists(accountName)) {
+            return overdraft();
+        }
+
+        inquirer.prompt([
+            {
+                name: "overdraft",
+                message: "Digite SOLICITAR para solicitar Cheque Especial ou CANCELAR para cancelar Cheque Especial"
+            }
+        ])
+        .then((answer) => {
+            const overdraft = answer["overdraft"];
+
+            if(overdraft === "") {
+                console.log(chalk.bgRed.black("O valor não pode ser vazio"));
+            } else if(overdraft === "SOLICITAR") {
+                overdraftFacility(accountName, overdraft);
+            } else if (overdraft === "CANCELAR") {
+                console.log(overdraft);
+            } else {
+                console.log(chalk.bgRed.black("O valor precisa ser SOLICITAR ou CANCELAR"));
+            }
+
+            
+        })
+        .catch((err) => console.log(err));
     })
     .catch((err) => console.log(err));
+}
+
+// overdraft facility
+function overdraftFacility(accountName, overdraft) {
+    const accountData = getAccount(accountName);
+
+    accountData.balance = parseFloat(accountData.balance) + 500;
+
+    fs.writeFileSync(`accounts/${accountName}.json`, JSON.stringify(accountData), (err) => console.log(err));
+
+    console.log(chalk.green(`Foi solicitado Cheque Especial no valor de R$500,00 da sua conta.`));
+
+    operation();
 }
 
 // exit account
